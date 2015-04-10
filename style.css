@@ -1,0 +1,30 @@
+#experiment {
+	background-color: transparent;
+	border: 2px gray solid;
+	margin-left: auto;
+	margin-right: auto;
+	margin-top: 20px;
+	margin-bottom: 15px;
+}
+
+.centerDiv {
+	width: 100%;
+	text-align: center;
+	margin-bottom: 5px;
+}
+
+input {
+	margin: 5px;
+}
+
+#messages {
+	color: #F24B5F;
+}
+
+.sys {
+	color: #557EFA;
+}
+
+.green {
+	color: #048046;
+}
