@@ -11,21 +11,67 @@ $(document).ready(function() {
 
 	var canvas = document.getElementById('experiment');
 	var ctx = canvas.getContext('2d');
+	var cursorCanvas = document.getElementById('cursor');
+	var cursorCtx = cursorCanvas.getContext('2d');
+	cursorCtx.globalAlpha = 0.2;
+	cursorCtx.fillStyle = 'red';
 	var expData = [];
 	var curTime;
 	var row;
 	var board;
 
+	/*
+* This a bubble cursor object.
+*/
+
+var BubbleCursor = function() {
+	
+	this.radius = 5;
+
+
+	this.update = function(pos) {
+
+		if ((board) && (board.circles.length !== 0)) {
+			var indexCloset = 0; 
+			var indexSecClosest = 0;
+			var closestDistance = Math.sqrt(canvasWidth * canvasWidth + canvasHeight * canvasHeight);
+			var secondClosestDis = closestDistance
+
+			for (var index = 0; index < board.circles.length; index++) { 
+				var dis = pos.minus(board.circles[index].pos).norm();
+				if ( dis <= secondClosestDis && closestDistance < dis) {
+					secondClosestDis = dis;
+					indexSecClosest = index;
+				} else if (dis <= closestDistance) {
+					secondClosestDis = closestDistance;
+					indexSecClosest = indexCloset;
+					indexCloset = index;
+					closestDistance = dis;
+					this.capturedCircle = board.circles[index];
+				}
+
+				var ConD = closestDistance + this.capturedCircle.w;
+				var IntD = secondClosestDis - this.capturedCircle.w;
+
+				this.radius = Math.min(ConD, IntD);
+			}
+		}
+	}
+}
+
 	var cursor = 'Normal';
+	var bubbleCursor = new BubbleCursor();
 
 	// Decide the cursor mode
 	$("input[name='cursorMode']").click(function(e) {
 		cursor = $("input[name='cursorMode']:checked").val();
 		if (cursor === 'Bubble') {
 			$("#experiment").css('cursor', 'none');
+			$("#cursor").css('cursor', 'none');
 		}
 		if ((cursor === 'Normal') && ($("#experiment").css('cursor') === 'none')) {
 			$("#experiment").css('cursor', '');
+			$("#cursor").css('cursor', '');
 		}
 	});
 
@@ -34,7 +80,6 @@ $(document).ready(function() {
 	/*
 	var curPos = new Pos(300, 300);
 	var tarPos = new Pos(300 + A[2], 300);
-
 	var board = new Board(curPos, tarPos, D[2], w[2], eww[0]);
 	*/
 
@@ -54,6 +99,38 @@ $(document).ready(function() {
 		}
 	}
 
+	var checkCapture = function(clickPos, tarPos, ranw) {
+		if (cursor === 'Normal') {
+			console.log('Normal cursor clicks.');
+			return (clickPos.minus(tarPos).norm() < ranw / 2);
+		} else if (cursor === 'Bubble') {
+			console.log('Bubble cursor clicks.');
+			bubbleCursor.update(clickPos);
+			return bubbleCursor.capturedCircle.pos.equal(tarPos);
+		} else {
+			console.log('cursor variable is ' + cursor);
+			return false;
+		}
+	}
+
+	var drawBubbleCursor = function(e) {
+		var x = e.pageX - canvas.offsetLeft - 2;
+		var y = e.pageY - canvas.offsetTop - 2;
+		var bubbleCursorPos = new Pos(x, y);
+		if (qualifyOnCanvas(bubbleCursorPos, 0)) {
+			cursorCtx.clearRect(0, 0, canvasWidth, canvasHeight);
+			bubbleCursor.update(bubbleCursorPos);
+			cursorCtx.beginPath();
+			cursorCtx.arc(x, y, bubbleCursor.radius, 2 * Math.PI, false);
+			cursorCtx.fill();
+			if ((bubbleCursorPos.minus(bubbleCursor.capturedCircle.pos).norm() + bubbleCursor.capturedCircle.w) > bubbleCursor.radius) {
+				cursorCtx.beginPath();
+				cursorCtx.arc(bubbleCursor.capturedCircle.pos.x, bubbleCursor.capturedCircle.pos.y, bubbleCursor.capturedCircle.w + 3, 2 * Math.PI, false);
+				cursorCtx.fill();
+			}
+		}
+	}
+
 	
 
 	/*
@@ -66,6 +143,7 @@ $(document).ready(function() {
 			+" To stop, click <span class='sys'>End Warm Up Test</span> button.")
 		$("#btnEndWarmUp").removeAttr('disabled');
 		$("#btnStartWarmUp").attr({'disabled': 'disabled'});
+		$("input[type=radio]").attr('disabled', true);
 		var ranA = A[randomInt(3)];
 		var ranw = w[randomInt(3)];
 		var raneww = eww[randomInt(3)];
@@ -79,7 +157,7 @@ $(document).ready(function() {
 			var x = e.pageX - canvas.offsetLeft - 2;
 			var y = e.pageY - canvas.offsetTop - 2;
 			var clickPos = new Pos(x, y);
-			if (clickPos.minus(tarPos).norm() < ranw / 2) {
+			if (checkCapture(clickPos, tarPos, ranw)) {
 				ranA = A[randomInt(3)];
 				ranw = w[randomInt(3)];
 				raneww = eww[randomInt(3)];
@@ -96,7 +174,17 @@ $(document).ready(function() {
 			}
 		}
 
-		canvas.addEventListener('click', clickCheck);
+		if (cursor === 'Normal') {
+			handlers = {click: clickCheck};
+		}
+		if (cursor === 'Bubble') {
+			handlers = {click: clickCheck, mousemove: drawBubbleCursor};
+		}
+		
+
+		//canvas.addEventListener('click', clickCheck);
+
+		$(document).on(handlers);
 	});
 
 	/* end warm up test button */
@@ -108,7 +196,7 @@ $(document).ready(function() {
 		$("#btnEndWarmUp").attr({'disabled': 'disabled'});
 		$("#btnStartTest").removeAttr('disabled');
 		ctx.clearRect(0, 0, canvasWidth, canvasHeight)
-		canvas.removeEventListener('click', clickCheck);
+		$(document).off(handlers);
 	});
 
 	/* start real test button */
@@ -140,7 +228,7 @@ $(document).ready(function() {
 			var x = e.pageX - canvas.offsetLeft - 2;
 			var y = e.pageY - canvas.offsetTop - 2;
 			var clickPos = new Pos(x, y);
-			if (clickPos.minus(tarPos).norm() < curRadius) {
+			if (checkCapture(clickPos, tarPos, 2 * curRadius)) {
 
 				var AinTest = testBlock.testSeries[seriesNum - 1][testNum - 1][3];
 				var winTest = testBlock.testSeries[seriesNum - 1][testNum - 1][0];
@@ -186,7 +274,7 @@ $(document).ready(function() {
 					testNum = testBlock.testSeries[0].length;
 					seriesNum -= 1;
 					if (seriesNum === 0) {
-						canvas.removeEventListener('click', testClickCheck);
+						$(document).off(handlers);
 						canvas.clearRect(0, 0, canvasWidth, canvasHeight);
 						$("#messages").html("You have finished this test experiment. Please write in "
 							+"<span class='sys'>Your Name</span> and download the experiment data in csv format.");
@@ -196,7 +284,14 @@ $(document).ready(function() {
 			}
 		}
 
-		canvas.addEventListener('click', testClickCheck);
+		if (cursor === 'Normal') {
+			handlers = {click: testClickCheck};
+		}
+		if (cursor === 'Bubble') {
+			handlers = {click: testClickCheck, mousemove: drawBubbleCursor};
+		}
+
+		$(document).on(handlers);
 	});
 
 	/* Download the data in csv format, Download test Data button */
@@ -226,5 +321,8 @@ $(document).ready(function() {
 			document.body.removeChild(link);
 		}
 	});
+
+
+
 
 })

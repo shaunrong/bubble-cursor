@@ -4,18 +4,19 @@
 	margin-left: auto;
 	margin-right: auto;
 	margin-top: 20px;
-	margin-bottom: 0px;
+	margin-bottom: 15px;
 	z-index: 20;
 }
 
 #cursor {
-	background-color: red;
+	background-color: transparent;
 	border: 2px gray solid;
 	margin-left: auto;
 	margin-right: auto;
-	margin-top: 0;
 	margin-bottom: 15px;
-	z-index: 40;
+	z-index: 10;
+	position: relative;
+	top: -523px;
 }
 
 .centerDiv {
@@ -30,6 +31,7 @@ input {
 
 #messages {
 	color: #F24B5F;
+	font-size: 1.5em;
 }
 
 .sys {
@@ -38,4 +40,9 @@ input {
 
 .green {
 	color: #048046;
+}
+
+.topShift {
+	position: relative;
+	top: -523px;
 }

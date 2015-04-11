@@ -13,6 +13,7 @@ var Board = function(curPos, tarPos, D, w, eww) {
 										 squareLength * Math.sin(angle + Math.PI/2));
 	this.circles = [];
 	this.grid = [];
+	this.cursorRadius = 5;
 
 	/* add a layer of grid point expanding from tarPos */
 	this.addLayer = function(layer) {
@@ -78,6 +79,38 @@ var Board = function(curPos, tarPos, D, w, eww) {
 		}
 	}
 
+	/*
+
+	this.updateCursorRadius = function(pos) {
+
+		if (this.circles.length !== 0) {
+			var indexCloset = 0; 
+			var indexSecClosest = 0;
+			var closestDistance = Math.sqrt(canvasWidth * canvasWidth + canvasHeight * canvasHeight);
+			var secondClosestDis = closestDistance
+
+			for (var i = 0； i < this.circles.length; i++) { 
+				var dis = pos.minus(this.circles[i].pos).norm();
+				if ( dis <= secondClosestDis && closestDistance < dis) {
+					secondClosestDis = dis;
+					indexSecClosest = i;
+				} else if (dis <= closestDistance) {
+					secondClosestDis = closestDistance;
+					indexSecClosest = indexCloset;
+					indexCloset = i;
+					closestDistance = dis;
+					this.capturedCircle = this.circles[i];
+				}
+
+				var ConD = closestDistance + this.capturedCircle.w;
+				var IntD = secondClosestDis - this.capturedCircle.w;
+
+				this.cursorRadius = Math.min(ConD, IntD);
+			}
+		}
+
+	*/
+
 	/** 
 	* Using the target voronoi square to expand, tiling over the board
 	* In such a way we can find all possible tiling square center to position 
@@ -98,6 +131,8 @@ var Board = function(curPos, tarPos, D, w, eww) {
 
 
 	this.addCircles();
+
+
 
 
 }

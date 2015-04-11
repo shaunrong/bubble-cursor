@@ -14,31 +14,34 @@
 		<canvas id='cursor' width='1200' height='500'>Please upgrade your browser</canvas>
 	</div>
 
-	<div class='centerDiv'>
-		<p id='messages'>Please select the <span class='sys'>Cursor Mode</span> and try some warm up tests. When you think you are ready, please end the warm up test and start the real test.</p>
-	</div>
+	<div class='topShift'>
+		<div class='centerDiv'>
+			<p id='messages'>Please select the <span class='sys'>Cursor Mode</span> and try some warm up tests. When you think you are ready, please end the warm up test and start the real test.</p>
+		</div>
 
-	<div class='centerDiv'>
-		Cursor Mode:
-		<input type='radio' name='cursorMode' value='Bubble'> Bubble
-		<input type='radio' name='cursorMode' value='Normal' checked> Normal
-	</div>
+		<div class='centerDiv'>
+			Cursor Mode:
+			<input type='radio' name='cursorMode' value='Bubble'> Bubble
+			<input type='radio' name='cursorMode' value='Normal' checked> Normal
+		</div>
 
-	<div class='centerDiv'>
-		<input id='btnStartWarmUp' type='button' value='Start Warm Up Test'>
-		<input id='btnEndWarmUp' type='button' value='End Warm Up Test' disabled>
-		<input id='btnStartTest' type='button' value='Start Real Test' disabled>
-	</div>
+		<div class='centerDiv'>
+			<input id='btnStartWarmUp' type='button' value='Start Warm Up Test'>
+			<input id='btnEndWarmUp' type='button' value='End Warm Up Test' disabled>
+			<input id='btnStartTest' type='button' value='Start Real Test' disabled>
+		</div>
 
-	<div class='centerDiv'>
-		Your Name: <input id='fileName' type='text'>
-		<input id='download' type='button' value='Download Test Data' disabled>
+		<div class='centerDiv'>
+			Your Name: <input id='fileName' type='text'>
+			<input id='download' type='button' value='Download Test Data' disabled>
+		</div>
 	</div>
 
 	<script type="text/javascript" src="external_js/jquery-1.9.0.min.js"></script>
 	<script type="text/javascript" src='share.js'></script>
 	<script type="text/javascript" src='board.js'></script>
 	<script type="text/javascript" src='testBlock.js'></script>
+	<!--<script type="text/javascript" src='bubbleCursor.js'></script>-->
 	<script type="text/javascript" src="main.js"></script>
 
 </body>
