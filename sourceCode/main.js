@@ -54,6 +54,7 @@ var BubbleCursor = function() {
 				var IntD = secondClosestDis - this.capturedCircle.w;
 
 				this.radius = Math.min(ConD, IntD);
+
 			}
 		}
 	}
@@ -101,10 +102,10 @@ var BubbleCursor = function() {
 
 	var checkCapture = function(clickPos, tarPos, ranw) {
 		if (cursor === 'Normal') {
-			console.log('Normal cursor clicks.');
+			//console.log('Normal cursor clicks.');
 			return (clickPos.minus(tarPos).norm() < ranw / 2);
 		} else if (cursor === 'Bubble') {
-			console.log('Bubble cursor clicks.');
+			//console.log('Bubble cursor clicks.');
 			bubbleCursor.update(clickPos);
 			return bubbleCursor.capturedCircle.pos.equal(tarPos);
 		} else {
@@ -270,12 +271,14 @@ var BubbleCursor = function() {
 					+ "/" + testBlock.testSeries[0].length + " of the current block");
 
 				testNum -= 1;
+				console.log('seriesNum is ' + seriesNum);
+				
 				if (testNum === 0) {
 					testNum = testBlock.testSeries[0].length;
 					seriesNum -= 1;
 					if (seriesNum === 0) {
 						$(document).off(handlers);
-						canvas.clearRect(0, 0, canvasWidth, canvasHeight);
+						ctx.clearRect(0, 0, canvasWidth, canvasHeight);
 						$("#messages").html("You have finished this test experiment. Please write in "
 							+"<span class='sys'>Your Name</span> and download the experiment data in csv format.");
 						$("#download").removeAttr('disabled');
@@ -303,6 +306,7 @@ var BubbleCursor = function() {
 				+ "and try some warm up tests. When you think you are ready, "
 				+ "please end the warm up test and start the real test.");
 			$("#btnStartWarmUp").removeAttr('disabled');
+			$("input[type=radio]").attr('disabled', false);
 
 			var mode = $("input[name='cursorMode']:checked").val();
 			//console.log(expData);
