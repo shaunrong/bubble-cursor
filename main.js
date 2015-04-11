@@ -8,8 +8,28 @@ $(document).ready(function() {
 	var w = [16 * conversionRate, 24 * conversionRate, 32 * conversionRate];
 	var eww = [1.33, 2, 3];
 	var D = [0, 0.5, 1];
+
 	var canvas = document.getElementById('experiment');
 	var ctx = canvas.getContext('2d');
+	var expData = [];
+	var curTime;
+	var row;
+	var board;
+
+	var cursor = 'Normal';
+
+	// Decide the cursor mode
+	$("input[name='cursorMode']").click(function(e) {
+		cursor = $("input[name='cursorMode']:checked").val();
+		if (cursor === 'Bubble') {
+			$("#experiment").css('cursor', 'none');
+		}
+		if ((cursor === 'Normal') && ($("#experiment").css('cursor') === 'none')) {
+			$("#experiment").css('cursor', '');
+		}
+	});
+
+
 
 	/*
 	var curPos = new Pos(300, 300);
@@ -25,10 +45,12 @@ $(document).ready(function() {
 			ctx.arc(circle.pos.x, circle.pos.y, circle.w, 0, 2 * Math.PI, false);
 			if (circle.isTarget) {
 				ctx.fillStyle = '#048046';
+				ctx.fill();
 			} else {
-				ctx.fillStyle = '#C4C4C4';
+				ctx.strokeStyle = '#C4C4C4';
+				ctx.lineWidth = 3;
+				ctx.stroke();
 			}
-			ctx.fill();
 		}
 	}
 
@@ -50,7 +72,7 @@ $(document).ready(function() {
 		var ranD = D[randomInt(3)];
 		var tarPos = new Pos(canvasWidth / 2, canvasHeight / 2);
 		var curPos = new Pos(0, 0)
-		var board = new Board(curPos, tarPos, ranD, ranw, raneww);
+		board = new Board(curPos, tarPos, ranD, ranw, raneww);
 		drawCircles(board);
 
 		clickCheck = function(e) {
@@ -91,13 +113,16 @@ $(document).ready(function() {
 
 	/* start real test button */
 	$("#btnStartTest").click(function(e) {
+		expData = [];
 		$("#messages").html("Your test will start after you hit the <span class='green'>target green"
 			+ " circle</span>");
+		$("#btnStartTest").attr({'disabled': 'disabled'});
+		//$("#download").removeAttr('disabled');
 
 		var testBlock = new TestBlock(A, w, eww, D);
 		var tarPos = new Pos(canvasWidth / 2, canvasHeight / 2);
 		var curPos = new Pos(canvasWidth / 2, 0)
-		var board = new Board(curPos, tarPos, 0, w[2], eww[1]);
+		board = new Board(curPos, tarPos, 0, w[2], eww[1]);
 		var curRadius = w[2] / 2;
 		drawCircles(board);
 
@@ -127,7 +152,27 @@ $(document).ready(function() {
 				ctx.clearRect(0, 0, canvasWidth, canvasHeight);
 				drawCircles(board);
 				curRadius = winTest / 2;
+
+				if ( expData.length === 0 ) {
+					row = 0;
+					curTime = new Date().getTime() / 1000;
+					//console.log(expData);
+				} else {
+					/* debug
+					console.log("accessing expData[0]['A'] is " + expData[0]['A']);
+					console.log('row number is ' + row);
+					*/
+					expData[row - 1]['clickTime'] = new Date().getTime() / 1000 - curTime;
+					curTime = new Date().getTime() / 1000;
+					//console.log(expData[row -1]);
+				}
+
+				expData[row] = {'A': AinTest, 'w': winTest, 'eww': ewwinTest, 'D': DinTest};
+				
+				row += 1;
 				/* debug use
+				console.log('row number is ' + row);
+				console.log('leng of expData is ' + expData.length);
 				console.log("You click into the target circle");
 				console.log('Current testNum is' + testNum);
 				console.log('Current seriesNum is' + seriesNum);
@@ -142,15 +187,44 @@ $(document).ready(function() {
 					seriesNum -= 1;
 					if (seriesNum === 0) {
 						canvas.removeEventListener('click', testClickCheck);
+						canvas.clearRect(0, 0, canvasWidth, canvasHeight);
+						$("#messages").html("You have finished this test experiment. Please write in "
+							+"<span class='sys'>Your Name</span> and download the experiment data in csv format.");
+						$("#download").removeAttr('disabled');
 					}
 				}
 			}
-			
 		}
 
 		canvas.addEventListener('click', testClickCheck);
+	});
 
-		
+	/* Download the data in csv format, Download test Data button */
+	$("#download").click(function(e) {
+		if ($("#fileName").val() === "") {
+			$("#messages").html("Please put in <span class='sys'>Your Name</span>.");
+		} else {
+			$("#messages").html("Please select the <span class='sys'>Cursor Mode</span> "
+				+ "and try some warm up tests. When you think you are ready, "
+				+ "please end the warm up test and start the real test.");
+			$("#btnStartWarmUp").removeAttr('disabled');
+
+			var mode = $("input[name='cursorMode']:checked").val();
+			//console.log(expData);
+			var CSV = JSONToCSV(expData, mode);
+			var fileName = $("#fileName").val() + '_' + mode;
+			fileName = fileName.split(' ').join('_');
+
+			var uri = 'data:text/csv;charset=utf-8,' + escape(CSV);
+			var link = document.createElement('a');
+			link.href = uri;
+			link.style = 'visibility: hidden';
+			link.download = fileName + '.csv';
+
+			document.body.appendChild(link);
+			link.click();
+			document.body.removeChild(link);
+		}
 	});
 
 })

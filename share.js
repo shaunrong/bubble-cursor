@@ -109,3 +109,26 @@ var shuffle = function(array) {
 	}
 	return array;
 }
+
+/* convert a Json into a csv file */
+var JSONToCSV = function(data, reportTitle) {
+	var CSV = '';
+	CSV += reportTitle + '\r\n\n'
+
+	var row = '';
+	for (var index in data[0]) {
+		row += index + ',';
+	}
+	row = row.slice(0, -1);
+	CSV += row + '\r\n';
+
+	for (var i = 0; i < data.length - 1; i++) {
+		var row = '';
+		for (var index in data[i]) {
+			row += data[i][index] + ',';
+		}
+		row = row.slice(0, -1);
+		CSV += row + '\r\n';
+	}
+	return CSV;
+}

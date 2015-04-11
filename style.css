@@ -5,6 +5,17 @@
 	margin-right: auto;
 	margin-top: 20px;
 	margin-bottom: 15px;
+	z-index: 20;
+}
+
+#cursor {
+	background-color: red;
+	border: 2px gray solid;
+	margin-left: auto;
+	margin-right: auto;
+	margin-top: 0;
+	margin-bottom: 15px;
+	z-index: 40;
 }
 
 .centerDiv {
